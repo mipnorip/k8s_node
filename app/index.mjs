@@ -6,7 +6,7 @@ const PORT = 3000;
 
 
 app.get('/', (req, res) => {
-    const message = `hello from ${os.hostname()}`;
+    const message = `v1.0 hello from ${os.hostname()}`;
     console.log(req.ip, message);
     res.send(message);
 });
