@@ -12,7 +12,7 @@ const PG_PASSWORD = process.env.POSTGRES_PASSWORD;
 const PG_DB = process.env.POSTGRES_DB;
 
 app.get('/', (req, res) => {
-    const message = `v1.0 hello from ${os.hostname()}`;
+    const message = `v3.0 hello from ${os.hostname()}`;
     console.log(req.ip, message);
     res.send(message);
 });
