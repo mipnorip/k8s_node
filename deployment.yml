@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-node-echo
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: k8s-node-echo
+  template:
+    metadata:
+      labels:
+        app: k8s-node-echo
+    spec:
+      containers:
+      - name: node-echo
+        image: mipnorip/node_app:2.0
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3000
+        # env:
+        #   - name: POSTGRES_DB
+        #     value: node
+        #   - name: POSTGRES_USER
+        #     value: user
+        #   - name: POSTGRES_PASSWORD
+        #     value: password
+        #   - name: POSTGRES_HOST
+        #     value: database.default
+      
+
+      # - name: database
+      #   image: postgres:latest
+      #   resources:
+      #     limits:
+      #       memory: "128Mi"
+      #       cpu: "500m"
+      #   ports:
+      #   - containerPort: 5432
+      #   env:
+      #     - name: POSTGRES_USER
+      #       value: user
+      #     - name: POSTGRES_PASSWORD
+      #       value: password
+      #     - name: POSTGRES_HOST
+      #       value: db
+      
