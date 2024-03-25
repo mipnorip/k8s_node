@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-node-echo
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: k8s-node-echo
+  template:
+    metadata:
+      labels:
+        app: k8s-node-echo
+    spec:
+      containers:
+      - name: node-echo
+        image: mipnorip/node_app:3.0
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3000
+        env:
+          - name: POSTGRES_DB
+            value: node
+          - name: POSTGRES_USER
+            value: user
+          - name: POSTGRES_PASSWORD
+            value: password
+          - name: POSTGRES_HOST
+            value: database
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-balanser
+spec:
+  type: LoadBalancer
+  selector:
+    app: k8s-node-echo
+  ports:
+  - port: 3000
+    targetPort: 3000
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database
+spec:
+  replicas: 1
+  selector:  
+    matchLabels:
+      app: database
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      containers:
+      - name: database
+        image: postgres:latest
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5432
+        env:
+          - name: POSTGRES_DB
+            value: node
+          - name: POSTGRES_USER
+            value: user
+          - name: POSTGRES_PASSWORD
+            value: password
+          - name: POSTGRES_HOST
+            value: database
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+spec:
+  selector:
+    app: database
+  ports:
+  - port: 5432
+    targetPort: 5432
