@@ -1,14 +1,15 @@
 import express from 'express';
 import os from 'os';
-import { Client } from 'pg'
+import pg from 'pg';
+const Client = pg.Client
 import process from 'process';
 
 const app = express();
 const PORT = 3000;
-const PG_HOST = process.env.POSTGRESS_HOST;
-const PG_USER = process.env.POSTGRESS_HOST;
-const PG_PASSWORD = process.env.POSTGRESS_HOST;
-const PG_DB = process.env.POSTGRESS_DB;
+const PG_HOST = process.env.POSTGRES_HOST;
+const PG_USER = process.env.POSTGRES_USER;
+const PG_PASSWORD = process.env.POSTGRES_PASSWORD;
+const PG_DB = process.env.POSTGRES_DB;
 
 app.get('/', (req, res) => {
     const message = `v1.0 hello from ${os.hostname()}`;
@@ -17,7 +18,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/time', (req, res) => {
-    console.log(req.ip, message);
+    console.log(req.ip);
     const client = new Client({
         host: PG_HOST,
         database: PG_DB,
@@ -25,20 +26,18 @@ app.get('/time', (req, res) => {
         password: PG_PASSWORD,
         port: 5432
     });
-    client.connect().then(() => {
-        client.query('NOW();', (err, res) => {
-            if (err){
-                console.log(`error: ${err}`);
-                const time = err;
-                return;
-            } else {
-                const time = res;
-            }
-            res.send(time)
-            return;
+    client.connect()
+    .then(() => {
+        client.query('SELECT NOW();').then((response) => {
+            const time = response.rows.pop().now;
+            res.send(`pg time is ${time}`);
         })
     })
-    res.send('Error. Not connected to DB')
+    .catch((err) => {
+        res.send(`Error. Not connected to DB<br/>${err}`);
+    })
+    
+    return;
 })
 
 app.listen(PORT, () => {
